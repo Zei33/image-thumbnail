@@ -129,8 +129,9 @@ const getDimensions = (imageBuffer, percentageOfImage, dimensions) => {
 const sharpResize = (imageBuffer, dimensions, jpegOptions, fit, failOnError, withMetadata) => {
     return new Promise((resolve, reject) => {
         let result = sharp(imageBuffer, { failOnError })
+            .flatten({background: { r: 255, g: 255, b: 255, alpha: 1 }})
             .resize({
-                ...dimensions, withoutEnlargement: true, fit: fit ? fit : 'contain',
+                ...dimensions, withoutEnlargement: true, fit: fit ? fit : 'contain', background: { r: 255, g: 255, b: 255, alpha: 1 },
             })
 
             if(withMetadata){
