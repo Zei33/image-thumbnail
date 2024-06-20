@@ -77,7 +77,7 @@ const fromBuffer = async (source, percentage, width, height, responseType, jpegO
     return thumbnailBuffer;
 };
 
-module.exports = async (source, options) => {
+export default imageThumbnail = async (source, options) => {
     const percentage = options && options.percentage ? options.percentage : PERCENTAGE;
     const width = options && options.width ? options.width : undefined;
     const height = options && options.height ? options.height : undefined;
