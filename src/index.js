@@ -1,13 +1,11 @@
-'use strict';
-
-const fs = require('fs');
-const stream = require('stream');
-const sizeOf = require('image-size');
-const sharp = require('sharp');
-const validator = require('validator');
-const axios = require('axios');
-const util = require('./util');
-const { fail } = require('assert');
+import fs from 'fs';
+import { PassThrough } from 'stream';
+import sizeOf from 'image-size';
+import sharp from 'sharp';
+import validator from 'validator';
+import axios from 'axios';
+import * as util from './util.js';
+import { fail } from 'assert';
 
 const PERCENTAGE = 10;
 const RESPONSE_TYPE = 'buffer';
@@ -30,7 +28,6 @@ const fromUri = async (source, percentage, width, height, responseType, jpegOpti
 
     const dimensions = getDimensions(imageBuffer, percentage, { width, height });
     const thumbnailBuffer = await sharpResize(imageBuffer, dimensions, jpegOptions, fit, failOnError, withMetaData);
-
 
     if (responseType === 'base64') {
         return thumbnailBuffer.toString('base64');
@@ -77,7 +74,7 @@ const fromBuffer = async (source, percentage, width, height, responseType, jpegO
     return thumbnailBuffer;
 };
 
-export default imageThumbnail = async (source, options) => {
+const imageThumbnail = async (source, options) => {
     const percentage = options && options.percentage ? options.percentage : PERCENTAGE;
     const width = options && options.width ? options.width : undefined;
     const height = options && options.height ? options.height : undefined;
@@ -91,7 +88,7 @@ export default imageThumbnail = async (source, options) => {
         switch (typeof source) {
             case 'object':
                 let response;
-                if (source instanceof fs.ReadStream || source instanceof stream.PassThrough) {
+                if (source instanceof fs.ReadStream || source instanceof PassThrough) {
                     response = await fromReadStream(source, percentage, width, height, responseType, jpegOptions, fit, failOnError, withMetaData);
                 } else if (source instanceof Buffer) {
                     response = await fromBuffer(source, percentage, width, height, responseType, jpegOptions, fit, failOnError, withMetaData);
@@ -132,13 +129,13 @@ const sharpResize = (imageBuffer, dimensions, jpegOptions, fit, failOnError, wit
             .flatten({background: { r: 255, g: 255, b: 255, alpha: 1 }})
             .resize({
                 ...dimensions, withoutEnlargement: true, fit: fit ? fit : 'contain', background: { r: 255, g: 255, b: 255, alpha: 1 },
-            })
+            });
 
-            if(withMetadata){
-              result.withMetadata()
-            }
+        if(withMetadata){
+            result = result.withMetadata();
+        }
 
-            result.jpeg(jpegOptions ? jpegOptions : { force: false })
+        result.jpeg(jpegOptions ? jpegOptions : { force: false })
             .toBuffer((err, data) => {
                 if (err) {
                     reject(err);
@@ -148,3 +145,5 @@ const sharpResize = (imageBuffer, dimensions, jpegOptions, fit, failOnError, wit
             });
     });
 };
+
+export { imageThumbnail, fromBase64, fromUri, fromPath, fromReadStream, fromBuffer };
