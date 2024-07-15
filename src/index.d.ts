@@ -18,4 +18,4 @@ interface UriSource {
 
 declare function imageThumbnail(source: Buffer | ReadStream | PassThrough | UriSource | string, options?: ThumbnailOptions): Promise<Buffer | string>;
 
-export { imageThumbnail };
+export { imageThumbnail, ThumbnailOptions, UriSource };
